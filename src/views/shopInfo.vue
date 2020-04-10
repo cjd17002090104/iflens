@@ -7,11 +7,23 @@
       <div class="container-xl">
         <div class="row">
           <div class="col-6">
-            <div class="productImage"></div>
+            <div class="productImage">
+              <div class="images" v-viewer>
+                <div class="imageBox col-4">
+                  <img
+                    style="width:100%;display:block;"
+                    v-for="(img,index) in product.images"
+                    :src="$url+img.image_url"
+                    :key="index"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
           <div class="col-6">
             <div class="producDetail">
-              <h4>Ducky One 2 Mini RGB LED 60% Double Shot PBT Mechanical Keyboard</h4>
+              <h4>{{product.title}}</h4>
+              <p style="font-size:14px;line-height:12px;color:#919191;">{{product.description}}</p>
               <div class="tagBox">
                 <div class="appraise float-left">
                   <i class="fa fa-thumbs-o-up" style="color:white;">&nbsp20</i>
@@ -20,13 +32,13 @@
                   <i class="fa fa-commenting-o" style="color:white;">&nbsp20</i>
                 </div>
               </div>
-              <div class="productPrice">¥66.00</div>
+              <div class="productPrice">¥{{product.sku[0].price}}</div>
               <div class="detailBtn">
                 <p>查看详情参数</p>
               </div>
               <div class="dropdownBox">
                 <div>
-                  折射率：
+                  选&nbsp&nbsp项：
                   <div class="dropdown">
                     <a
                       class="btn btn-secondary dropdown-toggle refractivity"
@@ -36,12 +48,15 @@
                       data-toggle="dropdown"
                       aria-haspopup="true"
                       aria-expanded="false"
-                    >Dropdown link</a>
+                    >{{product.sku[currentSku].description}}</a>
 
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <a class="dropdown-item" href="#">Something else here</a>
+                    <div class="dropdown-menu">
+                      <a
+                        class="dropdown-item"
+                        v-for="(sku,index) of product.sku"
+                        :key="index"
+                        @click="changeSku(index)"
+                      >{{sku.description}}</a>
                     </div>
                   </div>
                 </div>
@@ -67,11 +82,36 @@
                 </div>
               </div>
               <div class="number">
-                数&nbsp&nbsp&nbsp量：
-                <input type="text" class="form-control numberText" />
+                <p class="float-left">数&nbsp&nbsp&nbsp量：</p>
+                <div class="input-group input-group-sm mb-3" style="width:80px;padding-top:5px">
+                  <div class="input-group-prepend">
+                    <button
+                      class="btn btn-outline-secondary"
+                      type="button"
+                      @click="amount--"
+                      :disabled="amount==1"
+                    >-</button>
+                  </div>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder
+                    aria-describedby="basic-addon1"
+                    style="text-align:center"
+                    :value="amount"
+                    disabled
+                  />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" @click="amount++">+</button>
+                  </div>
+                </div>
               </div>
               <div class="commit">
-                <button type="button" class="commitBtn btn btn-danger btn-lg rounded-pill">添加订单</button>
+                <button
+                  type="button"
+                  class="commitBtn btn btn-danger btn-lg rounded-pill"
+                  @click="addToCart()"
+                >添加购物车</button>
               </div>
             </div>
           </div>
@@ -102,13 +142,19 @@
         </div>
       </nav>
       <div class="tab-content" id="nav-tabContent">
-        <div
-          class="tab-pane fade show active"
-          id="nav-delailValue"
-          role="tabpanel"
-          aria-labelledby="nav-delailValue-tab"
-        >
-          <div class="container-xl">1</div>
+        <div class="tab-pane fade show active" id="nav-delailValue" role="tabpanel">
+          <div class="container-xl detilTable">
+            <div class="row">
+              <div
+                class="col-3"
+                v-for="(parameter,index) of product.productable"
+                :key="index"
+                v-show="parameters[index]!=undefined"
+              >{{parameters[index]+"："+parameter}}</div>
+
+              <div class="col-3"></div>
+            </div>
+          </div>
         </div>
 
         <div
@@ -172,8 +218,44 @@
 <script>
 import rate from "@/components/rate.vue";
 export default {
+  mounted() {
+    this.$http
+      .post(this.$api.getProduct, {
+        productId: this.$route.params.productId
+      })
+      .then(res => {
+        this.product = res.product;
+        console.log(res.product);
+      });
+  },
   data() {
-    return {};
+    return {
+      product: {},
+      currentSku: 0,
+      amount: 1,
+      parameters: {
+        brand: "品牌",
+        type: "类型",
+        transmittance: "折射系数",
+        refraction: "折射",
+        weight: "重量",
+        membrane: "膜",
+        spherical: "球面",
+        texture: "材质",
+        country: "国家"
+      }
+    };
+  },
+  methods: {
+    changeSku(index) {
+      this.currentSku = index;
+    },
+    addToCart() {
+      this.$http.post(this.$api.addToCart, {
+        skuId: this.product.sku[this.currentSku].id,
+        amount: this.amount
+      });
+    }
   },
   components: {
     rate: rate
@@ -189,7 +271,6 @@ export default {
 .row {
   > div {
     height: 620px;
-    border: 1px solid black;
   }
 }
 .producDetail {
@@ -253,10 +334,7 @@ export default {
 .number {
   height: 40px;
   line-height: 40px;
-  > input {
-    width: 50px;
-    display: inline;
-  }
+
   margin-bottom: 40px;
 }
 .commitBtn {
@@ -301,6 +379,36 @@ export default {
   font-size: 14px;
   p {
     margin-bottom: 0px;
+  }
+}
+.dropdown-item {
+  text-align: center;
+  cursor: pointer;
+}
+.detilTable {
+  height: 500px;
+  padding-top: 20px;
+  padding-left: 100px;
+  padding-right: 100px;
+  .col-3 {
+    text-align: center;
+    line-height: 40px;
+    height: 40px;
+    border: none;
+    margin-bottom: 20px;
+    color: #919191;
+  }
+}
+.imageBox {
+  display: flex;
+  height: 150px;
+  align-items: center;
+  cursor: pointer;
+}
+.productImage {
+  height: 100%;
+  > div {
+    height: 100%;
   }
 }
 </style>

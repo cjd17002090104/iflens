@@ -1,9 +1,9 @@
-<template>
+  <template>
   <div>
     <headTop></headTop>
     <searchTop></searchTop>
     <pageNav></pageNav>
-    <div class="userUi">
+    <div class="userUi" v-show="!user==''">
       <div class="container-xl">
         <div>
           <div class="leftClomn">
@@ -13,7 +13,7 @@
             <div class="imageBox">
               <img class="userImage rounded-circle" src="~assets/images/login_bg.jpg" />
               <div calss="name">
-                <p style="font-size:22px;margin-top:5px">AssHunter</p>
+                <p style="font-size:22px;margin-top:5px">{{user.name}}</p>
                 <p style="margin-top:-10px">普通用户</p>
               </div>
             </div>
@@ -53,68 +53,10 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="inputGroup-sizing-sm">昵称</span>
                     </div>
-                    <input
-                      type="text"
-                      class="form-control"
-                      aria-label="Small"
-                      aria-describedby="inputGroup-sizing-sm"
-                    />
-                  </div>
-                  <div class="input-group input-group-sm userName">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text" id="inputGroup-sizing-sm">用户名</span>
-                    </div>
-                    <input
-                      type="text"
-                      class="form-control"
-                      aria-label="Small"
-                      aria-describedby="inputGroup-sizing-sm"
-                      disabled
-                      value="10086"
-                    />
-                  </div>
-                  <div class="input-group input-group-sm userDescription">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text" id="inputGroup-sizing-sm">个性签名</span>
-                    </div>
-                    <input
-                      type="text"
-                      class="form-control"
-                      aria-label="Small"
-                      aria-describedby="inputGroup-sizing-sm"
-                      value
-                    />
+                    <input type="text" class="form-control" :value="user.name" />
                   </div>
 
-                  <div class="input-group input-group-sm checkBox">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text" id="inputGroup-sizing-sm">性别</span>
-                    </div>
-                    <div class="gender rounded-right">
-                      <div class="form-check form-check-inline">
-                        <input
-                          class="form-check-input"
-                          type="radio"
-                          name="inlineRadioOptions"
-                          id="inlineRadio1"
-                          value="1"
-                          v-model="gender"
-                        />
-                        <label class="form-check-label" for="inlineRadio1">男</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input
-                          class="form-check-input"
-                          type="radio"
-                          name="inlineRadioOptions"
-                          id="inlineRadio2"
-                          value="2"
-                          v-model="gender"
-                        />
-                        <label class="form-check-label" for="inlineRadio2">女</label>
-                      </div>
-                    </div>
-                  </div>
+                  <div class="input-group input-group-sm checkBox"></div>
                   <div class="save" style="display:block">
                     <button type="button" class="btn btn-info">保存</button>
                   </div>
@@ -148,54 +90,119 @@
                       <div>
                         <p class="optionName">密码</p>
                         <p class="optionState">已绑定</p>
-                        <a type="button" class="optionOperation">修改密码</a>
+                        <a type="button" class="operation">修改密码</a>
                       </div>
                     </li>
                     <li>
                       <div>
                         <p class="optionName">手机</p>
                         <p class="optionState">已绑定</p>
-                        <a type="button" class="optionOperation">修改手机</a>
+                        <a type="button" class="operation">修改手机</a>
                       </div>
                     </li>
                     <li>
                       <div>
                         <p class="optionName">邮箱</p>
                         <p class="optionState">已绑定</p>
-                        <a type="button" class="optionOperation">修改邮箱</a>
+                        <a type="button" class="operation">修改邮箱</a>
                       </div>
                     </li>
                   </ul>
                 </div>
-                <div slot="myMessage2">
-                  <ul class="adressList">
-                    <li class="listHead">
-                      <div class="row">
-                        <div class="col-8">地址</div>
-                        <div class="col-2">收件人</div>
-                        <div class="col-2">操作</div>
-                      </div>
-                    </li>
-                    <li class="adress">
-                      <div class="row">
-                        <div class="col-8">安徽阜阳小岗村</div>
-                        <div class="col-2">AssHunter</div>
-                        <div class="col-2">
-                          <a class="adressOption">修改地址</a>
+                <div slot="myMessage2" class="addressTable">
+                  <div class="addresses">
+                    <ul class="addressList">
+                      <li class="listHead">
+                        <div class="row">
+                          <div class="col-6">地址</div>
+                          <div class="col-2">联系方式</div>
+                          <div class="col-2">收件人</div>
+                          <div class="col-2">操作</div>
+                        </div>
+                      </li>
+
+                      <li class="address" v-for="(address,index) of user.addresses" :key="index">
+                        <div class="row">
+                          <div class="col-6">{{address.address}}</div>
+                          <div class="col-2">{{address.contact_phone}}</div>
+                          <div class="col-2">{{address.contact_name}}</div>
+                          <div class="col-2">
+                            <a class="operation" style="margin-right:15px;">修改</a>
+                            <a class="operation" id="delete" @click="deleteAddress(address.id)">删除</a>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="footer">
+                    <div
+                      class="btn btn-danger"
+                      data-toggle="modal"
+                      data-target="#addressModal"
+                      @click="modelOpen()"
+                    >添加地址</div>
+                  </div>
+                  <div class="modal fade" id="addressModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="addressModalTitle">添加地址</h5>
+                          <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                          >
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <!-- 模态框 -->
+                        <div class="modal-body">
+                          <div
+                            class="input-group input-group-sm"
+                            style="width:200px;margin-bottom:20px"
+                          >
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">收件人</span>
+                            </div>
+                            <input
+                              type="text"
+                              class="form-control"
+                              v-model="currentAddress.contact_name"
+                            />
+                          </div>
+                          <div
+                            class="input-group input-group-sm"
+                            style="width:200px;margin-bottom:20px"
+                          >
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">联系方式</span>
+                            </div>
+                            <input
+                              type="text"
+                              class="form-control"
+                              v-model="currentAddress.contact_phone"
+                            />
+                          </div>
+                          <div class="input-group input-group-sm">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">地址</span>
+                            </div>
+                            <input
+                              type="text"
+                              class="form-control"
+                              v-model="currentAddress.address"
+                            />
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-primary" @click="addAddress()">保 存</button>
                         </div>
                       </div>
-                    </li>
-                    <li class="adress">
-                      <div class="row">
-                        <div class="col-8">安徽阜阳小岗村</div>
-                        <div class="col-2">AssHunter</div>
-                        <div class="col-2">
-                          <a class="adressOption">修改地址</a>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
+                    </div>
+                  </div>
                 </div>
+
                 <div class="myOrder0" slot="myOrder0">
                   <ul class="myOrders">
                     <li class="product">
@@ -215,7 +222,7 @@
                         <div class="col-1 number">1</div>
                         <div class="col-2 productState">正在派发</div>
                         <div
-                          class="col-2 productOperation"
+                          class="col-2 operation"
                           data-toggle="modal"
                           data-target=".orderDetial"
                         >查看详情</div>
@@ -257,112 +264,7 @@
                         </div>
                         <div class="col-2 price">￥66</div>
                         <div class="col-1 number">1</div>
-                        <div class="col-2 productOperation">查看详情</div>
-                      </div>
-                    </li>
-                    <li class="product">
-                      <div class="row">
-                        <div class="col-1">
-                          <input type="checkbox" value="Vue.js" />
-                        </div>
-                        <div class="col-5 productInfo">
-                          <div class="productImg">
-                            <img src="~assets/images/example.jpg" />
-                          </div>
-                          <div class="description">
-                            <div class="productName">
-                              <p>123123asdasd1</p>
-                            </div>
-                            <div class="sku">123123</div>
-                          </div>
-                        </div>
-                        <div class="col-2 price">￥66</div>
-                        <div class="col-1 number">1</div>
-                        <div class="col-2 productOperation">查看详情</div>
-                      </div>
-                    </li>
-                    <li class="product">
-                      <div class="row">
-                        <div class="col-1">
-                          <input type="checkbox" value="Vue.js" />
-                        </div>
-                        <div class="col-5 productInfo">
-                          <div class="productImg">
-                            <img src="~assets/images/example.jpg" />
-                          </div>
-                          <div class="description">
-                            <div class="productName">
-                              <p>123123asdasd1</p>
-                            </div>
-                            <div class="sku">123123</div>
-                          </div>
-                        </div>
-                        <div class="col-2 price">￥66</div>
-                        <div class="col-1 number">1</div>
-                        <div class="col-2 productOperation">查看详情</div>
-                      </div>
-                    </li>
-                    <li class="product">
-                      <div class="row">
-                        <div class="col-1">
-                          <input type="checkbox" value="Vue.js" />
-                        </div>
-                        <div class="col-5 productInfo">
-                          <div class="productImg">
-                            <img src="~assets/images/example.jpg" />
-                          </div>
-                          <div class="description">
-                            <div class="productName">
-                              <p>123123asdasd1</p>
-                            </div>
-                            <div class="sku">123123</div>
-                          </div>
-                        </div>
-                        <div class="col-2 price">￥66</div>
-                        <div class="col-1 number">1</div>
-                        <div class="col-2 productOperation">查看详情</div>
-                      </div>
-                    </li>
-                    <li class="product">
-                      <div class="row">
-                        <div class="col-1">
-                          <input type="checkbox" value="Vue.js" />
-                        </div>
-                        <div class="col-5 productInfo">
-                          <div class="productImg">
-                            <img src="~assets/images/example.jpg" />
-                          </div>
-                          <div class="description">
-                            <div class="productName">
-                              <p>123123asdasd1</p>
-                            </div>
-                            <div class="sku">123123</div>
-                          </div>
-                        </div>
-                        <div class="col-2 price">￥66</div>
-                        <div class="col-1 number">1</div>
-                        <div class="col-2 productOperation">查看详情</div>
-                      </div>
-                    </li>
-                    <li class="product">
-                      <div class="row">
-                        <div class="col-1">
-                          <input type="checkbox" value="Vue.js" />
-                        </div>
-                        <div class="col-5 productInfo">
-                          <div class="productImg">
-                            <img src="~assets/images/example.jpg" />
-                          </div>
-                          <div class="description">
-                            <div class="productName">
-                              <p>123123asdasd1</p>
-                            </div>
-                            <div class="sku">123123</div>
-                          </div>
-                        </div>
-                        <div class="col-2 price">￥66</div>
-                        <div class="col-1 number">1</div>
-                        <div class="col-2 productOperation">查看详情</div>
+                        <div class="col-2 operation">查看详情</div>
                       </div>
                     </li>
                   </ul>
@@ -382,10 +284,17 @@
 <script>
 import cropperComponent from "@/components/cropperComponent.vue";
 import qs from "qs";
+
 export default {
   data() {
     return {
-      gender: "1",
+      currentAddress: {
+        id: "",
+        contact_name: "",
+        contact_phone: "",
+        address: ""
+      },
+      user: "",
       //active的tab名称
       tabName: "",
       //active的tab-content的插槽名称
@@ -409,8 +318,43 @@ export default {
       let i = this.active;
       this.active = tab;
       this.tabName = tabName;
-    }
+    },
 
+    initAddress() {
+      for (let index in this.currentAddress) {
+        this.currentAddress[index] = "";
+      }
+    },
+    modelOpen() {
+      this.initAddress();
+    },
+    addAddress() {
+      for (let index in this.currentAddress) {
+        if (this.currentAddress[index].trim() == "" && index != "id") {
+          layer.msg(index + "不能为空");
+          return false;
+        }
+      }
+      this.$http
+        .post(this.$api.addAddress, { address: this.currentAddress })
+        .then(res => {
+          if ((res.status = 200)) {
+            this.user.addresses = res.addresses;
+
+            $("#addressModal").modal("hide");
+          }
+        });
+    },
+    deleteAddress(id) {
+      layer.confirm("是否删除该地址", { icon: 3 }, e => {
+        this.$http.post(this.$api.deleteAddress, { id: id }).then(res => {
+          if (res.status == 200) {
+            this.user.addresses = res.addresses;
+          }
+          layer.close(e);
+        });
+      });
+    }
     // ccc(value) {
     //   alert(value);
     // }
@@ -418,10 +362,12 @@ export default {
   mounted() {
     this.tabName = this.frist_tabs[0].name;
     this.active = this.frist_tabs[0].info + "0";
-    alert(2);
-    let data = qs.stringify({ name: "123" });
-    this.$axios.post("/api/test", data).then(res => {
-      console.log(res);
+    //获取用户关联
+    this.$http.post(this.$api.getRelevance).then(res => {
+      if (res.status == 200) {
+        this.user = res.user;
+        console.log(this.user);
+      }
     });
   },
   components: {
@@ -555,6 +501,9 @@ export default {
   padding: 30px;
   width: 100%;
   height: 740px;
+  > div {
+    height: 100%;
+  }
 }
 .myMessage0 {
   > .input-group {
@@ -640,12 +589,9 @@ export default {
 .optionState {
   font-size: 14px;
 }
-.optionOperation {
-  font-size: 14px;
-  color: #00a1d6;
-}
-.adressList {
-  > .adress {
+
+.addressList {
+  > .address {
     height: 85px;
     border-top: 1px solid #ced4da;
   }
@@ -657,7 +603,7 @@ export default {
       width: 100%;
       text-align: center;
     }
-    .col-8 {
+    .col-6 {
       text-align: left;
     }
   }
@@ -665,7 +611,7 @@ export default {
     align-items: flex-end;
     margin-bottom: 10px;
   }
-  .adress {
+  .address {
     div {
       line-height: 84px;
     }
@@ -680,16 +626,21 @@ export default {
     float: left;
   }
 }
-.adressOption {
+.operation {
+  font-size: 14px;
   color: #00a1d6;
   cursor: pointer;
+}
+.operation:hover {
+  color: #028ab8;
 }
 .productImg {
   width: 80px;
   height: 80px;
   border: 1px solid black;
+  display: flex;
+  align-items: center;
   > img {
-    height: 100%;
     width: 100%;
   }
 }
@@ -726,10 +677,7 @@ export default {
 .price {
   color: #fe6200;
 }
-.productOperation {
-  cursor: pointer;
-  color: #00a1d6;
-}
+
 .ShoppingCart {
   height: 600px;
 }
@@ -737,5 +685,27 @@ export default {
 .ShoppingCart {
   overflow: auto;
   overflow-x: hidden;
+}
+.addressTable {
+  height: 100%;
+  .footer {
+    border-top: 1px solid #ced4da;
+    height: 50px;
+    position: relative;
+    bottom: 0px;
+    > div {
+      margin-top: 10px;
+      float: right;
+    }
+  }
+  .addresses {
+    height: 90%;
+  }
+}
+#delete {
+  color: rgb(255, 74, 74);
+}
+#delete:hover {
+  color: rgb(211, 41, 41);
 }
 </style>

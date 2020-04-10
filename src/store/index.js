@@ -7,6 +7,11 @@ export default new Vuex.Store({
     state: {
         user: "",
         isLogin: 0,
+        products: null,
+        //品牌筛选
+        currentBrand: null,
+        //类型筛选
+        currentProduct: null,
 
     },
     mutations: {
@@ -20,10 +25,15 @@ export default new Vuex.Store({
             }
 
         },
+        setProducts(state, products) {
+            state.products = products
+        },
         logout(state) {
             localStorage.removeItem('user');
             state.isLogin = 0
-        }
+        },
+
+
     },
     getters: {
         userData(state) {
@@ -32,6 +42,20 @@ export default new Vuex.Store({
                 state.isLogin = 1
             }
             return state;
-        }
+        },
+        products(state) {
+            return state.products
+        },
+        selectProducts(state) {
+            let brandProducts = state.products.map(product => {
+                if ((state.currentBrand == null ? true : state.currentBrand == product.productable.brand) && (state.currentProduct == null ? true : state.currentProduct == product.productable_type)) {
+                    return product
+                }
+            })
+
+            return brandProducts.filter(product => product != undefined);
+        },
+
+
     }
 })

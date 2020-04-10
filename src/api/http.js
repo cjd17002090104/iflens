@@ -27,9 +27,15 @@ axios.interceptors.response.use(response => {//数据拿到之后
 
 function successfun(res) {//处理后台返回的非200错误
     if (res.status === 200) {
-        layer.msg(res.message, { icon: 1 });
+        if (res.message) {
+            layer.msg(res.message, { icon: 1 });
+        }
         return res
+
     } else {
+        if (res.message) {
+            layer.msg(res.message, { icon: 1 });
+        }
         layer.msg(res.message, { icon: 3 });
         return res;
     }

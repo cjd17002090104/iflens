@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import index from '@/views/index'
 import login from '@/views/login'
 import shop from '@/views/shop'
-import shopInfo from '@/views/shopInfo'
+import productInfo from '@/views/shopInfo'
 import user from '@/views/user'
 import orderList from '@/views/orderList'
 
@@ -27,14 +27,10 @@ export default new Router({
       component: shop
     },
     {
-      path: '/shop/:shopId',
-      name: 'shopInfo',
-      component: shopInfo,
-      beforeEnter: (to, from, next) => {
-        // alert(to.params.shopId)
-        console.log(from.path)
-        next()
-      }
+      path: '/shop/:productId',
+      name: 'productInfo',
+      component: productInfo,
+
     },
     {
       path: '/user',

@@ -7,54 +7,69 @@
       <div class="row">
         <div class="col-9">
           <div class="sortConfig"></div>
-          <div class="productBox">
+          <div
+            class="productBox"
+            v-for="(product,index) in products"
+            :key="index"
+            v-show="index>=(currentPage-1)*pageStep&&index<currentPage*pageStep"
+          >
             <div>
               <div class="productImage">
                 <a>
-                  <img src="~assets/images/example.jpg" width="100%" />
+                  <img :src="$url+product.images[0].image_url" width="100%" />
                 </a>
               </div>
               <div class="description">
                 <p
-                  style="font-size:16px;line-height: 22px;color: #484848;text-align:left;margin-top:40px"
-                  title="Ducky One 2 Mini RGB LED 60% Double Shot PBT Mechanical Keyboard"
-                >Ducky One 2 Mini RGB LED 60% Double Shot PBT Mechanical Keyboard</p>
-                <p style="font-size:14px;line-height:24px;color:#1f9316;">Availability: In Stock</p>
+                  style="font-size:16px;line-height: 22px;color: #484848;text-align:left;margin-top:25px"
+                  :title="product.title"
+                >{{product.title}}</p>
+                <p style="font-size:14px;line-height:12px;color:#919191;">{{product.description}}</p>
                 <p
-                  style="font-size:14px;line-height:26px;color:#919191;"
-                >Switch options: Cherry MX Brown, Blue, Red, Black, Silver, or Silent RedKailh BOX White.</p>
+                  style="font-size:14px;line-height:24px;color:#1f9316;"
+                >销售状态：{{product.on_sale?'可售':""}}</p>
+                <p style="font-size:14px;line-height:26px;color:#919191;">
+                  商品选项：
+                  <span
+                    v-for="(sku,index) in product.sku"
+                    :key="index"
+                    style="margin-right:5px;"
+                    class="badge badge-secondary"
+                  >{{sku.description}}</span>
+                </p>
               </div>
               <div class="operation">
-                <p class="advicePrice">￥66</p>
+                <!-- <p class="advicePrice">{{"¥ "+products[0].sku[0].price}}</p> -->
                 <div class="btn">
-                  <button type="button" class="btn btn-primary details">查看详情</button>
+                  <button type="button" class="btn btn-primary details">
+                    <span @click=" link(product.id)">查看详情</span>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
           <nav aria-label="Page navigation">
-            <span style="line-height:38px;margin-left:30px;">第1页，共N页</span>
+            <span style="line-height:38px;margin-left:30px;">第{{currentPage}}页，共{{pageNum}}页</span>
+
             <ul class="pagination float-right">
-              <li class="page-item">
-                <a class="page-link" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                  <span class="sr-only">Previous</span>
-                </a>
+              <li
+                :class="{'page-item':true,'disabled':currentPage==1} "
+                @click="currentPage!=1?currentPage-=1:null"
+              >
+                <span class="page-link">Previous</span>
               </li>
-              <li class="page-item">
-                <a class="page-link">1</a>
+              <li class="page-item" v-for="index of pageNum" :key="index">
+                <span
+                  :class=" {'page-link':true,'active':index==currentPage}"
+                  @click="changePage(index)"
+                >{{index}}</span>
               </li>
-              <li class="page-item">
-                <a class="page-link">2</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link">3</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                  <span class="sr-only">Next</span>
-                </a>
+
+              <li
+                :class="{'page-item':true,'disabled':currentPage==pageNum} "
+                @click="currentPage!=pageNum?currentPage+=1:null"
+              >
+                <a class="page-link">Next</a>
               </li>
             </ul>
           </nav>
@@ -72,34 +87,13 @@
               >分类</h5>
               <div id="rightColumn1" class="collapse show" role="tabpanel">
                 <ul>
-                  <li>
-                    <span>
-                      <i class="fa fa-angle-right"></i> 镜片
-                    </span>
-                  </li>
-                  <li>
-                    <span>
-                      <i class="fa fa-angle-right"></i> 镜架
-                    </span>
-                  </li>
-                  <li>
-                    <span>
-                      <i class="fa fa-angle-right"></i> 镜片
-                    </span>
-                  </li>
-                  <li>
-                    <span>
-                      <i class="fa fa-angle-right"></i> 镜架
-                    </span>
-                  </li>
-                  <li>
-                    <span>
-                      <i class="fa fa-angle-right"></i> 镜片
-                    </span>
-                  </li>
-                  <li>
-                    <span>
-                      <i class="fa fa-angle-right"></i> 镜架
+                  <li v-for="(type,index) in productType" :key="index">
+                    <span
+                      :class="{'active':type.value==currentProduct}"
+                      @click="changeType(type.value)"
+                    >
+                      <i class="fa fa-angle-right"></i>
+                      {{type.name}}
                     </span>
                   </li>
                 </ul>
@@ -116,9 +110,15 @@
               <div id="rightColumn2" class="collapse" role="tabpanel">
                 <ul>
                   <li>
-                    <span>
+                    <span :class="{'active':null==currentBrand}" @click="changeBrand(null)">
                       <i class="fa fa-angle-right"></i>
-                      卡尔蔡司
+                      全部
+                    </span>
+                  </li>
+                  <li class v-for="(brand,index) in productBrand" :key="index">
+                    <span :class="{'active':index==currentBrand}" @click="changeBrand(index)">
+                      <i class="fa fa-angle-right"></i>
+                      {{brand}}
                     </span>
                   </li>
                 </ul>
@@ -172,8 +172,78 @@
 
 <script>
 export default {
+  mounted() {
+    this.getProducts();
+  },
+
   data() {
-    return {};
+    return {
+      products: [],
+      isLoding: 1,
+      currentPage: 1,
+      pageStep: 8,
+      productType: [
+        { name: "全部", value: null },
+        { name: "镜架", value: `App\\Models\\Frame` },
+        { name: "镜片", value: `App\\Models\\Lens` }
+      ],
+      productBrand: ["品牌1", "品牌2", "品牌3", "品牌4"]
+    };
+  },
+  methods: {
+    //从后端获取product
+    getProducts() {
+      this.$http.get(this.$api.getProducts).then(res => {
+        if (res.status == 200) {
+          this.$store.commit("setProducts", res.products);
+          this.products = this.Products;
+        }
+      });
+    },
+    //换页
+    changePage(index) {
+      this.currentPage = index;
+    },
+    //筛选类型
+    changeType(value) {
+      //改变vuex筛选数据
+      this.$store.state.currentProduct = value;
+      //改变数据
+      this.products = this.Products;
+      //当前页置0
+      this.currentPage = 1;
+      console.log(this.Products);
+    },
+    //筛选品牌
+    changeBrand(index) {
+      this.$store.state.currentBrand = index;
+      this.products = this.Products;
+      this.currentPage = 1;
+      console.log(this.Products);
+    },
+    link(path) {
+      this.$router.push({ path: "/shop/" + path });
+    }
+  },
+
+  computed: {
+    //总页数
+    pageNum() {
+      if (this.products.length > this.pageStep) {
+        return Math.floor(this.products.length / this.pageStep) + 1;
+      } else {
+        return 1;
+      }
+    },
+    currentBrand() {
+      return this.$store.state.currentBrand;
+    },
+    currentProduct() {
+      return this.$store.state.currentProduct;
+    },
+    Products() {
+      return this.$store.getters.selectProducts;
+    }
   }
 };
 </script>
@@ -329,5 +399,28 @@ export default {
 }
 .hotPrice {
   font-size: 20px;
+}
+.product {
+  margin-bottom: 20px;
+}
+.page-item {
+  color: #007bff;
+  .active {
+    background: #007bff;
+    color: white;
+  }
+  cursor: pointer;
+}
+nav {
+  .active:hover {
+    background: #007bff;
+    color: white;
+  }
+}
+
+#rightColumn {
+  .active {
+    color: #fe6200;
+  }
 }
 </style>

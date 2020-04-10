@@ -191,7 +191,9 @@ export default {
       this.$http.post(this.$api.login, data).then(res => {
         if (res.status == 200) {
           //成功后将jwt token 存入localstorage
+
           localStorage.JWT_TOKEN = res.token;
+          alert(localStorage.JWT_TOKEN);
           this.getAuth();
         }
       });
