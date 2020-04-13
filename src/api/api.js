@@ -7,5 +7,7 @@ export default {
     addToCart: "/addToCart",
     addAddress: "/addAddress",
     getRelevance: "/getRelevance",
-    deleteAddress: "/deleteAddress"
+    deleteAddress: "/deleteAddress",
+    updateUserData: "/updateUserData",
+    setOrder: "/setOrder"
 }

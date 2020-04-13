@@ -11,7 +11,7 @@
               <p>个人中心</p>
             </div>
             <div class="imageBox">
-              <img class="userImage rounded-circle" src="~assets/images/login_bg.jpg" />
+              <img class="userImage rounded-circle" :src="$url+user.image.image_url" />
               <div calss="name">
                 <p style="font-size:22px;margin-top:5px">{{user.name}}</p>
                 <p style="margin-top:-10px">普通用户</p>
@@ -53,17 +53,68 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="inputGroup-sizing-sm">昵称</span>
                     </div>
-                    <input type="text" class="form-control" :value="user.name" />
+                    <input type="text" class="form-control" v-model="currentName" />
+                  </div>
+                  <div class="eyes_data">
+                    <div class="input-group input-group-sm eyesDataStatus">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">近视远视情况</span>
+                      </div>
+                      <input type="text" class="form-control" v-model="currentEyesData.status" />
+                    </div>
+                    <div class="input-group input-group-sm eyesDataVision">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">视力</span>
+                      </div>
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="currentEyesData.left"
+                        placeholder="左眼度数"
+                      />
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="currentEyesData.right"
+                        placeholder="右眼度数"
+                      />
+                    </div>
+                    <div class="input-group input-group-sm eyesDataOther">
+                      <div class="input-group-prepend pd">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">瞳距</span>
+                      </div>
+                      <input type="text" class="form-control" v-model="currentEyesData.pd" />
+                      <div class="input-group-prepend axis">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">轴度</span>
+                      </div>
+                      <input type="text" class="form-control" v-model="currentEyesData.axis" />
+                    </div>
+                    <div class="input-group input-group-sm eyesDataVisualAcuity">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">矫正视力</span>
+                      </div>
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="currentEyesData.visual_acuity"
+                      />
+                    </div>
+                    <div class="input-group input-group-sm eyesDatacylinder">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">散光</span>
+                      </div>
+                      <input type="text" class="form-control" v-model="currentEyesData.cylinder" />
+                    </div>
                   </div>
 
                   <div class="input-group input-group-sm checkBox"></div>
                   <div class="save" style="display:block">
-                    <button type="button" class="btn btn-info">保存</button>
+                    <button type="button" class="btn btn-info" @click="updateUserData()">保存</button>
                   </div>
                 </div>
                 <div slot="myMessage1" class="myMessage1">
                   <div class="ImageBox">
-                    <img class="userImage rounded-circle" src="~assets/images/login_bg.jpg" />
+                    <img class="userImage rounded-circle" :src="$url+user.image.image_url" />
                   </div>
                   <button
                     type="button"
@@ -127,7 +178,13 @@
                           <div class="col-2">{{address.contact_phone}}</div>
                           <div class="col-2">{{address.contact_name}}</div>
                           <div class="col-2">
-                            <a class="operation" style="margin-right:15px;">修改</a>
+                            <a
+                              class="operation"
+                              style="margin-right:15px;"
+                              data-toggle="modal"
+                              data-target="#addressModal"
+                              @click="modelOpen(address)"
+                            >修改</a>
                             <a class="operation" id="delete" @click="deleteAddress(address.id)">删除</a>
                           </div>
                         </div>
@@ -139,7 +196,7 @@
                       class="btn btn-danger"
                       data-toggle="modal"
                       data-target="#addressModal"
-                      @click="modelOpen()"
+                      @click="modelOpen(null)"
                     >添加地址</div>
                   </div>
                   <div class="modal fade" id="addressModal" tabindex="-1" role="dialog">
@@ -205,32 +262,80 @@
 
                 <div class="myOrder0" slot="myOrder0">
                   <ul class="myOrders">
-                    <li class="product">
-                      <div class="row">
-                        <div class="col-5 productInfo">
-                          <div class="productImg">
-                            <img src="~assets/images/example.jpg" />
+                    <li class="myOrdersTitle">
+                      <div class="row" style="text-align:center">
+                        <div class="col-6">商品</div>
+                        <div class="col-2">单价</div>
+                        <div class="col-2">数量</div>
+                        <div class="col-2">总价</div>
+                      </div>
+                    </li>
+
+                    <li class="order" v-for="(order,index) of user.orders" :key="index">
+                      <div id="orderAccordion" data-children=".item">
+                        <div class="item" style="width:100%">
+                          <div
+                            data-toggle="collapse"
+                            data-parent="#orderAccordion"
+                            :href="'#orderAccordion'+index"
+                            aria-expanded="true"
+                            :aria-controls="'orderAccordion'+index"
+                            class="orderTitle"
+                          >
+                            <h6 class="float-left" style="margin-left:30px;">订单编号：{{order.no}}</h6>
+
+                            <h6
+                              class="float-right"
+                              style="margin-right:30px;margin-left:60px;"
+                            >支付时间：{{order.paid_at}}</h6>
+                            <h6
+                              class="float-right"
+                              style="argin-right:30px"
+                            >状态：{{order.order_status}}</h6>
                           </div>
-                          <div class="description">
-                            <div class="productName">
-                              <p>123123asdasd1</p>
+                          <div :id="'orderAccordion'+index" class="collapse show" role="tabpanel">
+                            <div
+                              class="orderItem row"
+                              v-for="(item,index) of order.items"
+                              :key="index"
+                            >
+                              <div class="col-6 productInfo">
+                                <div class="productImg">
+                                  <img src="~assets/images/example.jpg" />
+                                </div>
+                                <div class="description">
+                                  <div class="productName">
+                                    <p>{{item.product.title}}</p>
+                                  </div>
+                                  <div class="sku">
+                                    <span class="badge badge-secondary">{{item.product_sku.title}}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-2 price">￥{{item.price}}</div>
+                              <div class="col-2 number">{{item.amount}}</div>
+                              <div class="col-2 totlePrice price">￥{{item.price*item.amount}}</div>
                             </div>
-                            <div class="sku">123123</div>
+                            <div class="orderFooter">
+                              <div class="addressInfo col-9">
+                                <p class="orderAdress">收货地址：{{order.address}}</p>
+                                <p class="orderContact">
+                                  收货人：陈剑栋
+                                  <span style="margin-left:25px;">电话：10086</span>
+                                </p>
+                              </div>
+                              <div class="orderPrice col-3">
+                                总计：
+                                <span style="color: rgb(255, 74, 74);">￥{{order.total_amount}}</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                        <div class="col-2 price">￥66</div>
-                        <div class="col-1 number">1</div>
-                        <div class="col-2 productState">正在派发</div>
-                        <div
-                          class="col-2 operation"
-                          data-toggle="modal"
-                          data-target=".orderDetial"
-                        >查看详情</div>
                       </div>
                     </li>
                   </ul>
 
-                  <div class="modal fade orderDetial" tabindex="-1" role="dialog">
+                  <!-- <div class="modal fade orderDetial" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                       <div class="modal-content">
                         <div class="modal-header">
@@ -242,34 +347,136 @@
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div>-->
                 </div>
                 <div class="myOrder1" slot="myOrder1">
-                  <ul class="ShoppingCart">
-                    <li class="product">
+                  <ul class="cartItems">
+                    <li class="myOrdersTitle">
+                      <div class="row" style="text-align:center">
+                        <div class="col-1"></div>
+                        <div class="col-5">商品</div>
+                        <div class="col-2">单价</div>
+                        <div class="col-1">数量</div>
+                        <div class="col-2">总价</div>
+                      </div>
+                    </li>
+                    <li class="cartItem" v-for="(cartItem,index) of user.cart_items" :key="index">
                       <div class="row">
-                        <div class="col-1">
-                          <input type="checkbox" value="Vue.js" />
+                        <div class="col-1 checkClomn">
+                          <input type="checkbox" v-model="currentCartItems" :value="cartItem" />
                         </div>
                         <div class="col-5 productInfo">
                           <div class="productImg">
-                            <img src="~assets/images/example.jpg" />
+                            <img :src="$url+cartItem.product_sku.product.images[0].image_url" />
                           </div>
                           <div class="description">
                             <div class="productName">
-                              <p>123123asdasd1</p>
+                              <p>{{cartItem.product_sku.product.title}}</p>
                             </div>
-                            <div class="sku">123123</div>
+                            <span class="badge badge-secondary">{{cartItem.product_sku.title}}</span>
                           </div>
                         </div>
-                        <div class="col-2 price">￥66</div>
-                        <div class="col-1 number">1</div>
-                        <div class="col-2 operation">查看详情</div>
+                        <div class="col-2 price">￥{{cartItem.product_sku.price}}</div>
+                        <div class="col-1 number">{{cartItem.amount}}</div>
+                        <div
+                          class="col-2 totlePrice price"
+                        >￥{{cartItem.amount*cartItem.product_sku.price}}</div>
                       </div>
                     </li>
                   </ul>
                   <div class="Settlement">
-                    <button type="button" class="btn btn-danger float-md-right">结算</button>
+                    <button
+                      type="button"
+                      class="btn btn-danger float-md-right"
+                      @click="Settlement()"
+                    >结算 ￥{{ItemsPrice}}</button>
+                  </div>
+                  <div
+                    class="modal fade"
+                    id="cartModal"
+                    tabindex="-1"
+                    role="dialog"
+                    aria-labelledby="exampleModalLabel"
+                    aria-hidden="true"
+                  >
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="cartModalLabel">购物车</h5>
+                          <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                          >
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <p>
+                            <span style="color:#dc3545">{{currentCartItems.length}}</span>条订单，共
+                            <span style="color:#dc3545">{{ItemsPrice}}</span>元
+                          </p>
+                          <div class="dropdown">
+                            <button
+                              class="btn btn-secondary dropdown-toggle"
+                              type="button"
+                              id="dropdownMenuButton"
+                              data-toggle="dropdown"
+                              aria-haspopup="true"
+                              aria-expanded="false"
+                            >选择地址</button>
+                            <div
+                              class="dropdown-menu addressDropdown"
+                              aria-labelledby="dropdownMenuButton"
+                            >
+                              <a
+                                class="dropdown-item"
+                                v-for="(address,index) of user.addresses"
+                                :key="index"
+                                @click="changeCartAddress(address)"
+                              >
+                                <p>{{address.address}}</p>
+                                <p
+                                  style="font-size:14px;color:#99a2aa;float:left;margin-right:20px"
+                                >联系人：{{address.contact_name}}</p>
+                                <p
+                                  style="font-size:14px;color:#99a2aa;float:left"
+                                >电话：{{address.contact_phone}}</p>
+                              </a>
+                            </div>
+                          </div>
+                          <div class="input-group addressInput" style="margin-top:20px;">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">地址</span>
+                            </div>
+
+                            <input
+                              type="text"
+                              class="form-control col-6"
+                              disabled
+                              :value="cartAddress.address"
+                            />
+                            <input
+                              type="text"
+                              class="form-control col-2"
+                              disabled
+                              :value="cartAddress.contact_name"
+                            />
+                            <input
+                              type="text"
+                              class="form-control col-4"
+                              disabled
+                              :value="cartAddress.contact_phone"
+                            />
+                          </div>
+                        </div>
+
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-primary" @click="pay()">确定支付</button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </tab-content>
@@ -288,11 +495,21 @@ import qs from "qs";
 export default {
   data() {
     return {
+      currentName: "",
       currentAddress: {
         id: "",
         contact_name: "",
         contact_phone: "",
         address: ""
+      },
+      currentEyesData: {
+        status: "",
+        left: "",
+        right: "",
+        cylinder: "",
+        pd: "",
+        axis: "",
+        visual_acuity: ""
       },
       user: "",
       //active的tab名称
@@ -310,7 +527,9 @@ export default {
           info: "myOrder",
           second_tabs: ["全部订单", "购物车"]
         }
-      ]
+      ],
+      currentCartItems: [],
+      cartAddress: ""
     };
   },
   methods: {
@@ -320,17 +539,32 @@ export default {
       this.tabName = tabName;
     },
 
-    initAddress() {
-      for (let index in this.currentAddress) {
-        this.currentAddress[index] = "";
+    initAddress(address) {
+      if (address) {
+        this.currentAddress = JSON.parse(
+          JSON.stringify({
+            id: address.id,
+            contact_name: address.contact_name,
+            contact_phone: address.contact_phone,
+            address: address.address
+          })
+        );
+        console.log(this.currentAddress);
+      } else {
+        this.currentAddress = {
+          id: "",
+          contact_name: "",
+          contact_phone: "",
+          address: ""
+        };
       }
     },
-    modelOpen() {
-      this.initAddress();
+    modelOpen(address) {
+      this.initAddress(address);
     },
     addAddress() {
       for (let index in this.currentAddress) {
-        if (this.currentAddress[index].trim() == "" && index != "id") {
+        if (String(this.currentAddress[index]).trim() == "" && index != "id") {
           layer.msg(index + "不能为空");
           return false;
         }
@@ -354,7 +588,79 @@ export default {
           layer.close(e);
         });
       });
+    },
+    changeCartItems(cartItem) {
+      let index =
+        this.currentCartItems.indexOf(cartItem) == -1
+          ? this.currentCartItems.push(cartItem)
+          : this.currentCartItems.splice(index, 1);
+      console.log(this.currentCartItems);
+    },
+
+    Settlement() {
+      if (this.currentCartItems.length) {
+        $("#cartModal").modal("show");
+      } else {
+        layer.msg("请选择需要购买的物品");
+      }
+    },
+    changeCartAddress(address) {
+      this.cartAddress = JSON.parse(JSON.stringify(address));
+    },
+    //确定支付
+    pay() {
+      //判断是否已经选择地址
+      if (!this.cartAddress == "") {
+        this.$http
+          .post(this.$api.setOrder, {
+            cartItems: this.currentCartItems,
+            address: this.cartAddress.id
+          })
+          .then(res => {
+            if (res.status == 200) {
+              this.user.orders = res.orders;
+              $("#cartModal").modal("hide");
+            }
+          });
+      } else {
+        layer.msg("请选择收货地址");
+      }
+    },
+    getAuth() {
+      //发送token
+      this.$http.post(this.$api.getAuth).then(res => {
+        if (res.status == 200) {
+          //存入localstorage
+          localStorage.user = JSON.stringify(res.user);
+          //存入vuex
+          this.$store.commit("setUser");
+        }
+      });
+    },
+    updateUserData() {
+      for (let index in this.currentEyesData) {
+        if (String(this.currentEyesData[index]).trim() == "") {
+          layer.msg(index + "不能为空");
+          return false;
+        }
+      }
+      delete this.currentEyesData.id;
+      this.$http
+        .post(this.$api.updateUserData, {
+          name: this.currentName,
+          eyesData: this.currentEyesData
+        })
+        .then(res => {
+          if (res.status == 200) {
+            this.user.name = res.name;
+            console.log(this.user.name);
+            this.user.eyesData = res.eyesData;
+            this.getAuth();
+            layer.msg("更新成功", { icon: 1 });
+          }
+        });
     }
+
     // ccc(value) {
     //   alert(value);
     // }
@@ -366,9 +672,23 @@ export default {
     this.$http.post(this.$api.getRelevance).then(res => {
       if (res.status == 200) {
         this.user = res.user;
+        this.currentName = res.user.name;
+        console.log(res.user.eyes_data);
+        if (res.user.eyes_data) {
+          this.currentEyesData = res.user.eyes_data;
+        }
         console.log(this.user);
       }
     });
+  },
+  computed: {
+    ItemsPrice() {
+      let price = 0.0;
+      this.currentCartItems.forEach(item => {
+        price += parseFloat(item.product_sku.price) * parseFloat(item.amount);
+      });
+      return price;
+    }
   },
   components: {
     // 定义组件名
@@ -637,26 +957,13 @@ export default {
 .productImg {
   width: 80px;
   height: 80px;
-  border: 1px solid black;
   display: flex;
   align-items: center;
   > img {
     width: 100%;
   }
 }
-.product {
-  height: 85px;
-  margin-bottom: 50px;
-  > div {
-    height: 100%;
-    display: flex;
-    align-items: center;
-  }
-  .col-2,
-  .col-1 {
-    text-align: center;
-  }
-}
+
 .description {
   font-size: 15px;
   height: 100%;
@@ -678,8 +985,17 @@ export default {
   color: #fe6200;
 }
 
-.ShoppingCart {
+.cartItems {
   height: 600px;
+}
+.cartItem {
+  > .row {
+    > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }
 .myOrders,
 .ShoppingCart {
@@ -707,5 +1023,108 @@ export default {
 }
 #delete:hover {
   color: rgb(211, 41, 41);
+}
+.order {
+  border: 1px solid #ced4da;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  .col-2,
+  .col-1 {
+    text-align: center;
+  }
+}
+.myOrdersTitle {
+  margin-bottom: 10px;
+}
+.addressDropdown {
+  width: 400px;
+  > a {
+    height: 60px;
+    cursor: pointer;
+    > p {
+      margin-bottom: 10px;
+    }
+  }
+}
+.addressInput > input {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.eyes_data {
+  margin-left: 150px;
+  > div {
+    margin-bottom: 30px;
+  }
+}
+.eyesDataStatus {
+  width: 200px;
+}
+.eyesDataVision {
+  width: 300px;
+}
+.eyesDataCylinder {
+  width: 150px;
+}
+.eyesDataOther {
+  width: 350px;
+}
+.eyesDataVisualAcuity {
+  width: 200px;
+}
+.eyesDatacylinder {
+  width: 150px;
+}
+.myOrder0 {
+  height: 650px;
+  ul {
+    height: 100%;
+  }
+}
+
+.orderTitle {
+  width: 100%;
+  height: 40px;
+  color: #99a2aa;
+  background-color: rgba(0, 0, 0, 0.03);
+  > h6 {
+    line-height: 40px;
+    margin-bottom: 0px;
+  }
+}
+.checkClomn {
+  text-align: center;
+  line-height: 85px;
+}
+.orderItem {
+  > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    .productImg {
+      padding-left: 30px;
+      width: 120px;
+    }
+  }
+}
+.orderFooter {
+  height: 60px;
+  color: #99a2aa;
+  background-color: rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+  padding-left: 10px;
+  padding-right: 10px;
+  line-height: 25px;
+  > div {
+    float: left;
+  }
+  .orderPrice {
+    line-height: 60px;
+    text-align: right;
+  }
+  p {
+    margin-bottom: 5px;
+  }
 }
 </style>

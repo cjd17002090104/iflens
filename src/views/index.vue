@@ -1,49 +1,7 @@
 <template>
   <div>
     <headTop></headTop>
-    <!-- <div class="search_top">
-      <div class="container-xl">
-        <div class="logo"></div>
-        <div class="search_box">
-          <div
-            class="input-group input-group-lg"
-            style="height:100%; 
-                  align-items: center; 
-                  width:80% ;
-                  font-size:20px"
-          >
-            <div class="input-group-prepend">
-              <button
-                id="search_category"
-                class="btn btn-outline-light dropdown-toggle border-right-1"
-                type="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >全部分类</button>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else</a>
-                <div role="separator" class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Separated link</a>
-              </div>
-            </div>
-            <input
-              type="text"
-              class="form-control border-left-0"
-              id="search"
-              placeholder="请输入内容..."
-            />
-            <div class="input-group-prepend">
-              <button class="btn btn-light" type="button" id="search_btn">
-                <img src="~assets/icons/search.svg" style="width:25px" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>-->
+
     <searchTop></searchTop>
     <pageNav></pageNav>
     <div class="Carousel">

@@ -27,7 +27,9 @@
             aria-expanded="false"
           >我的账户</a>
           <div class="userOperation dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item">个人中心</a>
+            <a class="dropdown-item">
+              <router-link :to="{name:'user'}">个人中心</router-link>
+            </a>
             <a class="dropdown-item" @click="logout()">退出登录</a>
             <!-- <a class="dropdown-item" href="#"></a> -->
           </div>
@@ -117,5 +119,11 @@ router-link {
 }
 .dropdown-item {
   cursor: pointer;
+}
+.router-link {
+  text-decoration: none;
+}
+.router-link-active {
+  text-decoration: none;
 }
 </style>

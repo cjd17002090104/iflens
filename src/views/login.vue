@@ -206,7 +206,7 @@ export default {
           //存入localstorage
           localStorage.user = JSON.stringify(res.user);
           //存入vuex
-          this.$store.commit("setUser", this.$url);
+          this.$store.commit("setUser");
         }
       });
     },

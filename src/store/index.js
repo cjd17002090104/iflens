@@ -16,7 +16,7 @@ export default new Vuex.Store({
     },
     mutations: {
         //存入uvex
-        setUser(state, url) {
+        setUser(state) {
             if (localStorage.user) {
                 state.user = JSON.parse(localStorage.user)
                 state.isLogin = 1
