@@ -32,7 +32,7 @@
                   <i class="fa fa-commenting-o" style="color:white;">&nbsp20</i>
                 </div>
               </div>
-              <div class="productPrice">¥{{product.sku[0].price}}</div>
+              <div class="productPrice">¥{{price}}</div>
               <div class="detailBtn">
                 <p>查看详情参数</p>
               </div>
@@ -243,7 +243,53 @@ export default {
         spherical: "球面",
         texture: "材质",
         country: "国家"
-      }
+      },
+      brand: {
+        ZEISS: "蔡司",
+        Essilor: "依视路",
+        HOYA: "豪雅",
+        Rodenstock: "罗敦司得",
+        Seiko: "精工",
+        Shamir: "沙米尔",
+        Chemilens: "凯米",
+        Younger: "雅歌",
+        Transitions: "全视线",
+        Kodak: "柯达",
+        Nikon: "尼康",
+        Asahi: "朝日",
+        TOKAI: "东海",
+        WX: "万新",
+        Conant: "康耐特",
+        Mingyue: "明月",
+        Norville: "诺威尔",
+        ITOH: "伊藤",
+        Nidek: "尼德克"
+      },
+      type: [
+        "单光镜片",
+        "渐进镜片",
+        "防蓝光镜片",
+        "太阳镜片",
+        "偏光镜片",
+        "运动镜片",
+        "变色镜片",
+        "染色镜片",
+        "定制镜片",
+        "成长乐镜片",
+        "驾驶型镜片",
+        "数码型镜片",
+        "菁悦活力镜片"
+      ],
+      country: [
+        "中国",
+        "德国",
+        "日本",
+        "美国",
+        "以色列",
+        "法国",
+        "韩国",
+        "英国"
+      ]
     };
   },
   methods: {
@@ -255,6 +301,11 @@ export default {
         skuId: this.product.sku[this.currentSku].id,
         amount: this.amount
       });
+    }
+  },
+  computed: {
+    price() {
+      return this.product.sku[this.currentSku].price;
     }
   },
   components: {

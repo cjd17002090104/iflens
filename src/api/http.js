@@ -51,12 +51,13 @@ function errorfun(res) {
 
 
 export default {
-    post(url, data) {//post请求
+    post(url, data, stringify = true) {//post请求
+        stringify ? data = qs.stringify(data) : data;
         return axios({
             method: 'post',
             baseURL: localhosts,
             url,
-            data: qs.stringify(data),
+            data: data,
             withCredentials: true,
             timeout: 5000,//响应时间
         }).then(res => {

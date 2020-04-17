@@ -11,7 +11,7 @@
               <p>个人中心</p>
             </div>
             <div class="imageBox">
-              <img class="userImage rounded-circle" :src="$url+user.image.image_url" />
+              <img class="userImage rounded-circle" :src="$url+userImage.image_url" />
               <div calss="name">
                 <p style="font-size:22px;margin-top:5px">{{user.name}}</p>
                 <p style="margin-top:-10px">普通用户</p>
@@ -55,7 +55,7 @@
                     </div>
                     <input type="text" class="form-control" v-model="currentName" />
                   </div>
-                  <div class="eyes_data">
+                  <div class="eyes_data" v-show="true">
                     <div class="input-group input-group-sm eyesDataStatus">
                       <div class="input-group-prepend">
                         <span class="input-group-text" id="inputGroup-sizing-sm">近视远视情况</span>
@@ -114,7 +114,7 @@
                 </div>
                 <div slot="myMessage1" class="myMessage1">
                   <div class="ImageBox">
-                    <img class="userImage rounded-circle" :src="$url+user.image.image_url" />
+                    <img class="userImage rounded-circle" :src="$url+userImage.image_url" />
                   </div>
                   <button
                     type="button"
@@ -124,7 +124,7 @@
                   >更换头像</button>
 
                   <div
-                    class="modal fade bd-example-modal-lg"
+                    class="modal fade bd-example-modal-lg uploadModal"
                     tabindex="-1"
                     role="dialog"
                     aria-labelledby="myLargeModalLabel"
@@ -132,7 +132,7 @@
                   >
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content uploadImg">
-                        <cropperComponent></cropperComponent>
+                        <cropperComponent @upload="upload()"></cropperComponent>
                       </div>
                     </div>
                   </div>
@@ -301,7 +301,9 @@
                             >
                               <div class="col-6 productInfo">
                                 <div class="productImg">
-                                  <img src="~assets/images/example.jpg" />
+                                  <img
+                                    :src="$url+(item.product.images.length?item.product.images[0].image_url:1)"
+                                  />
                                 </div>
                                 <div class="description">
                                   <div class="productName">
@@ -367,7 +369,9 @@
                         </div>
                         <div class="col-5 productInfo">
                           <div class="productImg">
-                            <img :src="$url+cartItem.product_sku.product.images[0].image_url" />
+                            <img
+                              :src="$url+(cartItem.product_sku.product.images.length?cartItem.product_sku.product.images[0].image_url:1)"
+                            />
                           </div>
                           <div class="description">
                             <div class="productName">
@@ -511,7 +515,9 @@ export default {
         axis: "",
         visual_acuity: ""
       },
-      user: "",
+      user: {
+        image: {}
+      },
       //active的tab名称
       tabName: "",
       //active的tab-content的插槽名称
@@ -659,6 +665,11 @@ export default {
             layer.msg("更新成功", { icon: 1 });
           }
         });
+    },
+    upload() {
+      this.getAuth();
+
+      $(".uploadModal").modal("hide");
     }
 
     // ccc(value) {
@@ -681,6 +692,7 @@ export default {
       }
     });
   },
+
   computed: {
     ItemsPrice() {
       let price = 0.0;
@@ -688,6 +700,9 @@ export default {
         price += parseFloat(item.product_sku.price) * parseFloat(item.amount);
       });
       return price;
+    },
+    userImage() {
+      return this.$store.getters.userData.user.image;
     }
   },
   components: {

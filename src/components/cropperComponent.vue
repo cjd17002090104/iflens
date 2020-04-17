@@ -58,7 +58,7 @@ export default {
       crap: false,
       previews: {},
       option: {
-        img: "", // 裁剪图片的地址
+        img: "iflens.com/image/user", // 裁剪图片的地址
         info: true, // 裁剪框的大小信息
         outputSize: 1, // 剪切后的图片质量（0.1-1）
         full: true, // 输出原图比例截图 props名full
@@ -103,20 +103,26 @@ export default {
           let img = window.URL.createObjectURL(data);
           formData.append("multfile", data, _this.fileName);
           formData.append("operaType", this.uploadType);
-          this.$store
-            .dispatch("UPLOAD_HEAD", formData)
-            .then(res => {
-              let data = res.data.data;
-              this.$emit("upload", data);
-              this.$message.success("上传成功！");
-            })
-            .catch(err => {
-              if (err.data) {
-                this.$message.error(err.data.msg);
-              } else {
-                this.$message.error("上传失败！");
-              }
-            });
+          console.log(formData.get("multfile"));
+          this.$http.post(this.$api.upload, formData, false).then(res => {
+            if (res.status == 200) {
+              this.$emit("upload");
+            }
+          });
+          // this.$store
+          //   .dispatch("UPLOAD_HEAD", formData)
+          //   .then(res => {
+          //     let data = res.data.data;
+          //     this.$emit("upload", data);
+          //     this.$message.success("上传成功！");
+          //   })
+          //   .catch(err => {
+          //     if (err.data) {
+          //       this.$message.error(err.data.msg);
+          //     } else {
+          //       this.$message.error("上传失败！");
+          //     }
+          //   });
         });
       } else {
         this.$refs.cropper.getCropData(data => {

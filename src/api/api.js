@@ -9,5 +9,8 @@ export default {
     getRelevance: "/getRelevance",
     deleteAddress: "/deleteAddress",
     updateUserData: "/updateUserData",
-    setOrder: "/setOrder"
+    setOrder: "/setOrder",
+    getHotProducts: "getHotProducts",
+    getSearchProducts: "getSearchProducts",
+    upload: "upload",
 }

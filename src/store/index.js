@@ -12,6 +12,7 @@ export default new Vuex.Store({
         currentBrand: null,
         //类型筛选
         currentProduct: null,
+        searchProducts: null,
 
     },
     mutations: {
@@ -30,9 +31,13 @@ export default new Vuex.Store({
         },
         logout(state) {
             localStorage.removeItem('user');
-            state.isLogin = 0
-        },
+            localStorage.removeItem('JWT_token');
+            state.isLogin = 0;
 
+        },
+        setSearchProducts(state, products) {
+            state.searchProducts = products;
+        }
 
     },
     getters: {
@@ -55,7 +60,10 @@ export default new Vuex.Store({
 
             return brandProducts.filter(product => product != undefined);
         },
+        searchProducts(state) {
 
+            return state.searchProducts;
+        }
 
     }
 })

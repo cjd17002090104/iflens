@@ -16,7 +16,10 @@
             <div>
               <div class="productImage">
                 <a>
-                  <img :src="$url+product.images[0].image_url" width="100%" />
+                  <img
+                    :src="$url+(product.images.length?product.images[0].image_url:1)"
+                    style="width:100%"
+                  />
                 </a>
               </div>
               <div class="description">
@@ -39,7 +42,7 @@
                 </p>
               </div>
               <div class="operation">
-                <!-- <p class="advicePrice">{{"¥ "+products[0].sku[0].price}}</p> -->
+                <p class="advicePrice">¥ {{product.sku.length?product.sku[0].price:66}}</p>
                 <div class="btn">
                   <button type="button" class="btn btn-primary details">
                     <span @click=" link(product.id)">查看详情</span>
@@ -134,29 +137,26 @@
               >热销商品</h5>
               <div id="rightColumn3" class="collapse" role="tabpanel">
                 <ul>
-                  <li>
+                  <li
+                    v-for="(product,index) of hotProducts"
+                    :key="index"
+                    @click="$router.push({name:'productInfo', params: {'productId':product.id}})"
+                  >
                     <div class="hotSale">
                       <div class="hotImage">
                         <a>
-                          <img src="~assets/images/example.jpg" width="100%" />
+                          <img
+                            :src="$url+(product.images.length?product.images[0].image_url:1)"
+                            width="100%"
+                          />
                         </a>
                       </div>
                       <div class="hotDescription">
-                        <p class="hotTitle">Switch options: Cherry MX Brown, Blue, Red</p>
-                        <p class="hotPrice">￥66</p>
-                      </div>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="hotSale">
-                      <div class="hotImage">
-                        <a>
-                          <img src="~assets/images/example.jpg" width="100%" />
-                        </a>
-                      </div>
-                      <div class="hotDescription">
-                        <p class="hotTitle">Switch options: Cherry MX Brown, Blue, Red</p>
-                        <p class="hotPrice">￥66</p>
+                        <p class="hotTitle">{{product.title}}</p>
+                        <p
+                          class="hotPrice"
+                          style="color: #fe6200;"
+                        >￥ {{product.sku.length?product.sku[0].price:66}}</p>
                       </div>
                     </div>
                   </li>
@@ -174,14 +174,17 @@
 export default {
   mounted() {
     this.getProducts();
+    this.getHotProducts();
   },
 
   data() {
     return {
       products: [],
+      hotProducts: [],
       isLoding: 1,
       currentPage: 1,
       pageStep: 8,
+      amount: 5,
       productType: [
         { name: "全部", value: null },
         { name: "镜架", value: `App\\Models\\Frame` },
@@ -200,6 +203,18 @@ export default {
         }
       });
     },
+
+    getHotProducts() {
+      this.$http
+        .post(this.$api.getHotProducts, { amount: this.amount })
+        .then(res => {
+          if (res.status == 200) {
+            this.hotProducts = res.products;
+            console.log(this.hotProducts);
+          }
+        });
+    },
+
     //换页
     changePage(index) {
       this.currentPage = index;
@@ -294,7 +309,7 @@ export default {
 }
 .productImage {
   width: 228px;
-
+  overflow: hidden;
   > a {
     display: block;
     width: 100%;
@@ -357,21 +372,25 @@ export default {
   li > span:hover {
     color: #fe6200;
   }
-  li > span {
-    cursor: pointer;
-  }
+
   i {
     margin-right: 5px;
   }
 }
 .hotSale {
   height: 100px;
+  cursor: pointer;
   > div {
     height: 100%;
     float: left;
   }
   li {
     margin-bottom: 20px;
+  }
+}
+.hotSale:hover {
+  span {
+    color: #fe6200;
   }
 }
 .hotImage {
@@ -393,6 +412,8 @@ export default {
 }
 .hotTitle {
   cursor: pointer;
+  height: 50px;
+  overflow: hidden;
 }
 .hotTitle:hover {
   color: #fe6200;

@@ -14,33 +14,44 @@ export default new Router({
     {
       path: '/',
       name: 'index',
+      meta: {
+        login: false
+      },
       component: index
     },
     {
       path: '/login',
       name: 'login',
+      meta: {
+        login: false
+      },
       component: login
     },
     {
       path: '/shop',
       name: 'shop',
+      meta: {
+        login: false
+      },
       component: shop
     },
     {
       path: '/shop/:productId',
       name: 'productInfo',
+      meta: {
+        login: true
+      },
       component: productInfo,
 
     },
     {
       path: '/user',
       name: 'user',
+      meta: {
+        login: true
+      },
       component: user
     },
-    {
-      path: '/orderList',
-      name: 'orderList',
-      component: orderList
-    },
+
   ]
 })

@@ -28,6 +28,19 @@ Vue.prototype.$http = http
 Vue.prototype.$api = api
 Vue.prototype.$url = 'http://iflens.com'
 
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.login)) {
+    if (store.state.isLogin == 0) {
+      next('/login');
+    } else {
+      next();
+    }
+
+  } else {
+    next();
+  }
+})
+
 Vue.use(plugins);
 /* eslint-disable no-new */
 new Vue({

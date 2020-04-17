@@ -55,7 +55,7 @@ export default {
   }
 }
 .page_nav {
-  background: #fe6200;
+  background: #46a0ff;
   min-width: 1170px;
   height: 50px;
   padding: 0px;

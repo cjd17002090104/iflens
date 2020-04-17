@@ -11,23 +11,48 @@
                   font-size:20px"
         >
           <div class="input-group-prepend">
-            <button
-              id="search_category"
-              class="btn btn-outline-light dropdown-toggle border-right-1"
-              type="button"
+            <div class="selectBox">
+              <button
+                id="search_category"
+                class="btn btn-outline-light dropdown-toggle border-right-1"
+                type="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >{{type[currentType].name}}</button>
+              <div class="dropdown-menu">
+                <a
+                  :class="['dropdown-item',{'active':currentType==index}]"
+                  href="#"
+                  v-for="(type,index) of type"
+                  :key="index"
+                  @click="changeCurrentType(index)"
+                >{{type.name}}</a>
+              </div>
+            </div>
+          </div>
+          <div class="searchBox">
+            <input
+              type="text"
+              class="form-control border-left-0 dropdown-toggle"
+              id="search"
+              placeholder="请输入内容..."
               data-toggle="dropdown"
               aria-haspopup="true"
               aria-expanded="false"
-            >全部分类</button>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else</a>
-              <div role="separator" class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#">Separated link</a>
+              v-model="title"
+              @focus="searchDropdown=1"
+            />
+            <div class="dropdown-menu" v-show="searchDropdown">
+              <a
+                class="dropdown-item"
+                href="#"
+                v-for="(product,index) of this.searchProducts"
+                @click="$router.push({name:'productInfo', params: {'productId':product.id}})"
+                :key="index"
+              >{{product.title}}</a>
             </div>
           </div>
-          <input type="text" class="form-control border-left-0" id="search" placeholder="请输入内容..." />
           <div class="input-group-prepend">
             <button class="btn btn-light" type="button" id="search_btn">
               <img src="~assets/icons/search.svg" style="width:25px" />
@@ -40,7 +65,58 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      type: [
+        { name: "全部分类" },
+        { name: "镜片", value: `App\\Models\\Lens` },
+        { name: "镜架", value: `App\\Models\\Frame` }
+      ],
+      currentType: 0,
+      title: "",
+      searchAmount: "",
+      searchDropdown: 0
+    };
+  },
+  mounted() {
+    if (this.$store.state.searchProducts == null) {
+      this.getSeacrchProducts();
+    }
+  },
+  methods: {
+    getSeacrchProducts() {
+      this.$http.post(this.$api.getSearchProducts).then(res => {
+        if (res.status == 200) {
+          this.$store.commit("setSearchProducts", res.products);
+        }
+      });
+    },
+    changeCurrentType(index) {
+      this.currentType = index;
+    }
+  },
+  computed: {
+    allProducts() {
+      if (this.currentType != 0) {
+        return this.$store.getters.searchProducts.filter(product => {
+          return product.productable_type == this.type[this.currentType].value;
+        });
+      }
+      return this.$store.getters.searchProducts;
+    },
+    searchProducts() {
+      console.log(this.allProducts);
+      if (this.allProducts != null && this.title.trim() != "") {
+        return this.allProducts
+          .filter(product => {
+            return product.title.indexOf(this.title.trim()) !== -1;
+          })
+          .slice(0, 10);
+      }
+    }
+  }
+};
 </script>
 <style scoped lang="scss">
 @media (min-width: 1200px) {
@@ -86,6 +162,9 @@ export default {};
   float: left;
   height: 100%;
   width: 59%;
+}
+.searchBox {
+  width: 50%;
 }
 #search {
   border: 2px solid #e5e5e5;

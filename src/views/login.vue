@@ -193,7 +193,7 @@ export default {
           //成功后将jwt token 存入localstorage
 
           localStorage.JWT_TOKEN = res.token;
-          alert(localStorage.JWT_TOKEN);
+          console.log(localStorage.JWT_TOKEN);
           this.getAuth();
         }
       });
@@ -207,6 +207,8 @@ export default {
           localStorage.user = JSON.stringify(res.user);
           //存入vuex
           this.$store.commit("setUser");
+
+          this.$router.push({ path: "/" });
         }
       });
     },

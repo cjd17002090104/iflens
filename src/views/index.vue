@@ -7,31 +7,28 @@
     <div class="Carousel">
       <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
-          <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+          <li
+            v-for="(carousel,index) of carousels"
+            :key="index"
+            data-target="#carouselExampleCaptions"
+            data-slide-to="0"
+            :class="{'active':index==0}"
+          ></li>
           <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
           <li data-target="#carouselExampleCaptions" data-slide-to="2"></li>
         </ol>
         <div class="container-xl">
           <div class="carousel-inner">
-            <div class="carousel-item active">
-              <img src="../assets/images/slider1.jpg" class="d-block h-100" alt="..." />
+            <div
+              :class="['carousel-item',{'active':index==0}]"
+              v-for="(carousel,index) of carousels"
+              :key="index"
+              @click="$router.push({name:'productInfo', params: {'productId':carousel.id}})"
+            >
+              <img :src="carousel.url" class="d-block h-100" alt="..." />
               <div class="carousel-caption d-none d-md-block">
                 <h5>First slide label</h5>
                 <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-              </div>
-            </div>
-            <div class="carousel-item">
-              <img src="../assets/images/slider2.jpg" class="d-block h-100" alt="..." />
-              <div class="carousel-caption d-none d-md-block">
-                <h5>Second slide label</h5>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              </div>
-            </div>
-            <div class="carousel-item">
-              <img src="../assets/images/slider3.jpg" class="d-block h-100" alt="..." />
-              <div class="carousel-caption d-none d-md-block">
-                <h5>Third slide label</h5>
-                <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
               </div>
             </div>
           </div>
@@ -63,52 +60,39 @@
         <hr
           style="height:1px;border:none;border-top:1px solid #e5e5e5; margin-top:10px; margin-bottom:40px"
         />
-        <div class="card-deck">
-          <div class="card">
-            <img src="~assets/images/thumb_5479_thumb_VA108M2NLL3Dj2Pv_15.jpg" class="card-img-top" />
+        <div class="cardList">
+          <div
+            class="card"
+            v-for="(product,index) of products"
+            :key="index"
+            @click="$router.push({name:'productInfo', params: {'productId':product.id}})"
+          >
+            <div class="imagBox">
+              <img :src="$url+product.images[0].image_url" class="card-img-top" />
+            </div>
+
             <div class="card-body">
-              <h5 class="card-title">Card title</h5>
-              <p
-                class="card-text"
-              >This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-              <p class="card-text">
-                <small class="text-muted">Last updated 3 mins ago</small>
+              <h5 class="title" style="font-size:16px;">{{product.title}}</h5>
+              <p class="card-text" style="margin-bottom:5px;">
+                <span
+                  class="badge badge-secondary"
+                  style="margin-right:10px"
+                  v-for="(sku,index) of product.sku"
+                  :key="index"
+                >
+                  <small>{{sku.title}}</small>
+                </span>
               </p>
             </div>
-          </div>
-          <div class="card">
-            <img src="~assets/images/thumb_5479_thumb_VA108M2NLL3Dj2Pv_15.jpg" class="card-img-top" />
-            <div class="card-body">
-              <h5 class="card-title">Card title</h5>
-              <p
-                class="card-text"
-              >This card has supporting text below as a natural lead-in to additional content.</p>
-              <p class="card-text">
-                <small class="text-muted">Last updated 3 mins ago</small>
+            <div class="card-footer">
+              <p class="card-text float-left">
+                价格:
+                <span style="color:#fe6200;">￥{{product.sku.length?product.sku[0].price:66}}</span>
               </p>
-            </div>
-          </div>
-          <div class="card">
-            <img src="~assets/images/thumb_5479_thumb_VA108M2NLL3Dj2Pv_15.jpg" class="card-img-top" />
-            <div class="card-body">
-              <h5 class="card-title">Card title</h5>
-              <p
-                class="card-text"
-              >This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-              <p class="card-text">
-                <small class="text-muted">Last updated 3 mins ago</small>
-              </p>
-            </div>
-          </div>
-          <div class="card">
-            <img src="~assets/images/thumb_5479_thumb_VA108M2NLL3Dj2Pv_15.jpg" class="card-img-top" />
-            <div class="card-body">
-              <h5 class="card-title">Card title</h5>
-              <p
-                class="card-text"
-              >This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-              <p class="card-text">
-                <small class="text-muted">Last updated 3 mins ago</small>
+
+              <p class="card-text float-left" style="margin-left:30px;">
+                销量:
+                <span style="color:red;">{{product.items_count}}</span>
               </p>
             </div>
           </div>
@@ -122,8 +106,29 @@
 export default {
   data() {
     return {
-      isLogin: 1
+      products: [],
+      amount: 8,
+      carousels: [
+        { url: require("@/assets/images/slider1.jpg"), id: 1 },
+        { url: require("@/assets/images/slider2.jpg"), id: 2 },
+        { url: require("@/assets/images/slider3.jpg"), id: 3 }
+      ]
     };
+  },
+  mounted() {
+    this.getHotProducts();
+  },
+  methods: {
+    getHotProducts() {
+      this.$http
+        .post(this.$api.getHotProducts, { amount: this.amount })
+        .then(res => {
+          if (res.status == 200) {
+            this.products = res.products;
+            console.log(this.products);
+          }
+        });
+    }
   }
 };
 </script>
@@ -175,72 +180,6 @@ input[type="text"]:-ms-input-placeholder {
 .container-xl {
   min-width: 1170px;
 }
-// .title {
-//   color: #fe6200;
-//   font-family: "DFKai-SB";
-//   font-style: italic;
-//   float: left;
-//   margin-bottom: 0;
-//   span {
-//     color: #a8a9a9;
-//   }
-// }
-// .about {
-//   float: right;
-// }
-
-// .nav_btns {
-//   float: right;
-// }
-// .logo {
-//   height: 100%;
-//   border: 1px solid black;
-//   float: left;
-//   width: 17%;
-//   margin-right: 100px;
-// }
-// .search_top {
-//   .container-xl {
-//     height: 100px;
-//   }
-//   height: 100px;
-//   margin-bottom: 20px;
-// }
-// .search_box {
-//   float: left;
-//   height: 100%;
-//   width: 59%;
-// }
-// #search {
-//   border: 2px solid #e5e5e5;
-//   height: 50px;
-//   font-size: 16px;
-// }
-// #search:focus {
-//   box-shadow: none !important;
-//   border-color: #e5e5e5;
-// }
-// #search_category {
-//   border-radius: 40px 0px 0px 40px;
-//   border: 2px solid #e5e5e5;
-//   font-size: 16px;
-//   height: 50px;
-//   width: 170px;
-//   color: #989898;
-// }
-// #search_btn {
-//   margin-left: -30px;
-//   background-color: #ced4da;
-//   border-color: #ced4da;
-//   border-radius: 50px;
-//   width: 80px;
-//   z-index: 99;
-//   height: 50px;
-// }
-
-// #carouselExampleCaptions {
-//   height: 590px;
-// }
 .Carousel {
   margin-bottom: 40px;
   height: 590px;
@@ -265,5 +204,40 @@ input[type="text"]:-ms-input-placeholder {
 .title_bar {
   width: 100%;
   border: 1px 0 0 0;
+}
+.card-deck {
+  flex-wrap: wrap;
+}
+.row {
+  padding: 15px;
+}
+.card {
+  width: 250px;
+  margin-right: 17px;
+  margin-left: 17px;
+  margin-bottom: 40px;
+  .imagBox {
+    width: 100%;
+    height: 164px;
+    padding: 10px;
+    box-sizing: boder-box;
+    display: flex;
+    align-items: center;
+  }
+}
+.cardList {
+  justify-content: left;
+  display: flex;
+  flex-wrap: wrap;
+}
+.card-footer {
+  line-height: 15px;
+  height: 40px;
+}
+.card {
+  cursor: pointer;
+}
+.carousel-item {
+  cursor: pointer;
 }
 </style>

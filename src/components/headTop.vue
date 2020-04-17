@@ -27,9 +27,9 @@
             aria-expanded="false"
           >我的账户</a>
           <div class="userOperation dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item">
-              <router-link :to="{name:'user'}">个人中心</router-link>
-            </a>
+            <router-link :to="{name:'user'}" class="dropdown-item">
+              <a>个人中心</a>
+            </router-link>
             <a class="dropdown-item" @click="logout()">退出登录</a>
             <!-- <a class="dropdown-item" href="#"></a> -->
           </div>
@@ -60,6 +60,7 @@ export default {
   methods: {
     logout() {
       this.$store.commit("logout");
+      this.$router.push({ path: "/" });
     }
   }
 };
