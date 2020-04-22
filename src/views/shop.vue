@@ -6,7 +6,7 @@
     <div class="container-xl">
       <div class="row">
         <div class="col-9">
-          <div class="sortConfig"></div>
+          <!-- <div class="sortConfig"></div> -->
           <div
             class="productBox"
             v-for="(product,index) in products"
@@ -16,10 +16,7 @@
             <div>
               <div class="productImage">
                 <a>
-                  <img
-                    :src="$url+(product.images.length?product.images[0].image_url:1)"
-                    style="width:100%"
-                  />
+                  <img :src="$url+product.image" style="width:100%" />
                 </a>
               </div>
               <div class="description">
@@ -132,10 +129,10 @@
                 data-toggle="collapse"
                 data-parent="#rightColumn"
                 href="#rightColumn3"
-                aria-expanded="false"
+                aria-expanded="true"
                 aria-controls="rightColumn3"
               >热销商品</h5>
-              <div id="rightColumn3" class="collapse" role="tabpanel">
+              <div id="rightColumn3" class="collapse show" role="tabpanel">
                 <ul>
                   <li
                     v-for="(product,index) of hotProducts"
@@ -145,10 +142,7 @@
                     <div class="hotSale">
                       <div class="hotImage">
                         <a>
-                          <img
-                            :src="$url+(product.images.length?product.images[0].image_url:1)"
-                            width="100%"
-                          />
+                          <img :src="$url+product.image" width="100%" />
                         </a>
                       </div>
                       <div class="hotDescription">
@@ -442,6 +436,10 @@ nav {
 #rightColumn {
   .active {
     color: #fe6200;
+  }
+  h5,
+  span {
+    cursor: pointer;
   }
 }
 </style>

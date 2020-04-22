@@ -68,11 +68,16 @@
             @click="$router.push({name:'productInfo', params: {'productId':product.id}})"
           >
             <div class="imagBox">
-              <img :src="$url+product.images[0].image_url" class="card-img-top" />
+              <img :src="$url+product.image" class="card-img-top" />
             </div>
 
             <div class="card-body">
-              <h5 class="title" style="font-size:16px;">{{product.title}}</h5>
+              <h5 class="title" style="font-size:16px;height:40px;overflow:hidden">{{product.title}}</h5>
+              <p
+                style="font-size:12px;color:#a8a9a9;overflow: hidden;
+text-overflow:ellipsis;
+white-space: nowrap;"
+              >{{product.description}}</p>
               <p class="card-text" style="margin-bottom:5px;">
                 <span
                   class="badge badge-secondary"
@@ -90,7 +95,7 @@
                 <span style="color:#fe6200;">￥{{product.sku.length?product.sku[0].price:66}}</span>
               </p>
 
-              <p class="card-text float-left" style="margin-left:30px;">
+              <p class="card-text float-right" style="margin-left:30px;">
                 销量:
                 <span style="color:red;">{{product.items_count}}</span>
               </p>
@@ -216,10 +221,12 @@ input[type="text"]:-ms-input-placeholder {
   margin-right: 17px;
   margin-left: 17px;
   margin-bottom: 40px;
+  height: 360px;
   .imagBox {
     width: 100%;
     height: 164px;
     padding: 10px;
+    overflow: hidden;
     box-sizing: boder-box;
     display: flex;
     align-items: center;

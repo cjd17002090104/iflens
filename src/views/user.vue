@@ -140,26 +140,74 @@
                     <li>
                       <div>
                         <p class="optionName">密码</p>
-                        <p class="optionState">已绑定</p>
-                        <a type="button" class="operation">修改密码</a>
-                      </div>
-                    </li>
-                    <li>
-                      <div>
-                        <p class="optionName">手机</p>
-                        <p class="optionState">已绑定</p>
-                        <a type="button" class="operation">修改手机</a>
-                      </div>
-                    </li>
-                    <li>
-                      <div>
-                        <p class="optionName">邮箱</p>
-                        <p class="optionState">已绑定</p>
-                        <a type="button" class="operation">修改邮箱</a>
+                        <a
+                          type="button"
+                          class="operation"
+                          data-toggle="modal"
+                          data-target="#passwordModalLong"
+                        >修改密码</a>
                       </div>
                     </li>
                   </ul>
+                  <div
+                    class="modal fade"
+                    id="passwordModalLong"
+                    tabindex="-1"
+                    role="dialog"
+                    aria-labelledby="exampleModalLongTitle"
+                    aria-hidden="true"
+                  >
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLongTitle">密码修改</h5>
+                          <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                          >
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">当前密码</span>
+                            </div>
+                            <input
+                              type="password"
+                              class="form-control"
+                              aria-label="Sizing example input"
+                              aria-describedby="inputGroup-sizing-sm"
+                              v-model="currentPassword"
+                            />
+                          </div>
+                          <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">新密码</span>
+                            </div>
+                            <input
+                              type="text"
+                              class="form-control"
+                              aria-label="Sizing example input"
+                              aria-describedby="inputGroup-sizing-sm"
+                              v-model="newPassword"
+                            />
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-primary"
+                            @click="changePassword()"
+                          >更改密码</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
                 <div slot="myMessage2" class="addressTable">
                   <div class="addresses">
                     <ul class="addressList">
@@ -301,9 +349,7 @@
                             >
                               <div class="col-6 productInfo">
                                 <div class="productImg">
-                                  <img
-                                    :src="$url+(item.product.images.length?item.product.images[0].image_url:1)"
-                                  />
+                                  <img :src="$url+item.product.image" />
                                 </div>
                                 <div class="description">
                                   <div class="productName">
@@ -321,10 +367,6 @@
                             <div class="orderFooter">
                               <div class="addressInfo col-9">
                                 <p class="orderAdress">收货地址：{{order.address}}</p>
-                                <p class="orderContact">
-                                  收货人：陈剑栋
-                                  <span style="margin-left:25px;">电话：10086</span>
-                                </p>
                               </div>
                               <div class="orderPrice col-3">
                                 总计：
@@ -369,9 +411,7 @@
                         </div>
                         <div class="col-5 productInfo">
                           <div class="productImg">
-                            <img
-                              :src="$url+(cartItem.product_sku.product.images.length?cartItem.product_sku.product.images[0].image_url:1)"
-                            />
+                            <img :src="$url+cartItem.product_sku.product.image" />
                           </div>
                           <div class="description">
                             <div class="productName">
@@ -394,6 +434,11 @@
                       class="btn btn-danger float-md-right"
                       @click="Settlement()"
                     >结算 ￥{{ItemsPrice}}</button>
+                    <button
+                      type="button"
+                      class="btn btn-danger float-md-left"
+                      @click="deleteCartItems()"
+                    >删除</button>
                   </div>
                   <div
                     class="modal fade"
@@ -535,7 +580,9 @@ export default {
         }
       ],
       currentCartItems: [],
-      cartAddress: ""
+      cartAddress: "",
+      currentPassword: "",
+      newPassword: ""
     };
   },
   methods: {
@@ -624,7 +671,9 @@ export default {
           })
           .then(res => {
             if (res.status == 200) {
+              this.currentCartItems = [];
               this.user.orders = res.orders;
+              this.user.cart_items = res.cartItems;
               $("#cartModal").modal("hide");
             }
           });
@@ -670,6 +719,45 @@ export default {
       this.getAuth();
 
       $(".uploadModal").modal("hide");
+    },
+    deleteCartItems() {
+      let that = this;
+      if (this.currentCartItems.length) {
+        layer.open({
+          content: "确定删除勾选购物车?",
+          yes: function() {
+            that.$http
+              .post(that.$api.deleteCartItems, {
+                cartItems: that.currentCartItems
+              })
+              .then(res => {
+                if (res.status == 200) {
+                  that.user.cart_items = res.cartItems;
+                }
+              });
+          }
+        });
+      } else {
+        layer.msg("请选择需要删除的购物车");
+      }
+    },
+    changePassword() {
+      if (this.currentPassword.trim() == "") {
+        return layer.msg("当前密码不能为空");
+      }
+      if (this.newPassword.trim() == "") {
+        layer.msg("新密码不能为空");
+      }
+      this.$http
+        .post(this.$api.changePassword, {
+          currentPassword: this.currentPassword.trim(),
+          newPassword: this.newPassword.trim()
+        })
+        .then(res => {
+          if (res.status == 200) {
+            $("#passwordModalLong").modal("hide");
+          }
+        });
     }
 
     // ccc(value) {
@@ -1116,6 +1204,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 20px;
     margin-bottom: 20px;
     .productImg {
       padding-left: 30px;
@@ -1130,7 +1219,7 @@ export default {
   box-sizing: border-box;
   padding-left: 10px;
   padding-right: 10px;
-  line-height: 25px;
+  line-height: 60px;
   > div {
     float: left;
   }

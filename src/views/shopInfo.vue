@@ -12,7 +12,7 @@
                 <div class="imageBox col-4">
                   <img
                     style="width:100%;display:block;"
-                    v-for="(img,index) in product.images"
+                    v-for="(img,index) in product.productable.images"
                     :src="$url+img.image_url"
                     :key="index"
                   />
@@ -26,16 +26,16 @@
               <p style="font-size:14px;line-height:12px;color:#919191;">{{product.description}}</p>
               <div class="tagBox">
                 <div class="appraise float-left">
-                  <i class="fa fa-thumbs-o-up" style="color:white;">&nbsp20</i>
-                </div>
-                <div class="appraise float-left">
-                  <i class="fa fa-commenting-o" style="color:white;">&nbsp20</i>
+                  <i
+                    class="fa fa-cart-arrow-down"
+                    style="color:white;"
+                  >&nbsp{{product.items.length}}</i>
                 </div>
               </div>
               <div class="productPrice">¥{{price}}</div>
-              <div class="detailBtn">
+              <!-- <div class="detailBtn">
                 <p>查看详情参数</p>
-              </div>
+              </div>-->
               <div class="dropdownBox">
                 <div>
                   选&nbsp&nbsp项：
@@ -57,26 +57,6 @@
                         :key="index"
                         @click="changeSku(index)"
                       >{{sku.description}}</a>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  类&nbsp&nbsp&nbsp型：
-                  <div class="dropdown">
-                    <a
-                      class="btn btn-secondary dropdown-toggle refractivity"
-                      href="#"
-                      role="button"
-                      id="dropdownMenuLink"
-                      data-toggle="dropdown"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                    >Dropdown link</a>
-
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <a class="dropdown-item" href="#">Something else here</a>
                     </div>
                   </div>
                 </div>
@@ -130,7 +110,7 @@
             aria-controls="nav-delailValue"
             aria-selected="true"
           >参数</a>
-          <a
+          <!-- <a
             class="nav-item nav-link"
             id="nav-comment-tab"
             data-toggle="tab"
@@ -138,7 +118,7 @@
             role="tab"
             aria-controls="nav-comment"
             aria-selected="false"
-          >评论</a>
+          >评论</a>-->
         </div>
       </nav>
       <div class="tab-content" id="nav-tabContent">
@@ -150,14 +130,14 @@
                 v-for="(parameter,index) of product.productable"
                 :key="index"
                 v-show="parameters[index]!=undefined"
-              >{{parameters[index]+"："+parameter}}</div>
+              >{{parameters[index]+"："+(!values.hasOwnProperty(index)?parameter:values[index][parameter])}}</div>
 
               <div class="col-3"></div>
             </div>
           </div>
         </div>
 
-        <div
+        <!-- <div
           class="tab-pane fade"
           id="nav-comment"
           role="tabpanel"
@@ -209,7 +189,7 @@
               </li>
             </ul>
           </div>
-        </div>
+        </div>-->
       </div>
     </div>
   </div>
@@ -219,14 +199,7 @@
 import rate from "@/components/rate.vue";
 export default {
   mounted() {
-    this.$http
-      .post(this.$api.getProduct, {
-        productId: this.$route.params.productId
-      })
-      .then(res => {
-        this.product = res.product;
-        console.log(res.product);
-      });
+    this.getproduct();
   },
   data() {
     return {
@@ -244,52 +217,56 @@ export default {
         texture: "材质",
         country: "国家"
       },
-      brand: {
-        ZEISS: "蔡司",
-        Essilor: "依视路",
-        HOYA: "豪雅",
-        Rodenstock: "罗敦司得",
-        Seiko: "精工",
-        Shamir: "沙米尔",
-        Chemilens: "凯米",
-        Younger: "雅歌",
-        Transitions: "全视线",
-        Kodak: "柯达",
-        Nikon: "尼康",
-        Asahi: "朝日",
-        TOKAI: "东海",
-        WX: "万新",
-        Conant: "康耐特",
-        Mingyue: "明月",
-        Norville: "诺威尔",
-        ITOH: "伊藤",
-        Nidek: "尼德克"
-      },
-      type: [
-        "单光镜片",
-        "渐进镜片",
-        "防蓝光镜片",
-        "太阳镜片",
-        "偏光镜片",
-        "运动镜片",
-        "变色镜片",
-        "染色镜片",
-        "定制镜片",
-        "成长乐镜片",
-        "驾驶型镜片",
-        "数码型镜片",
-        "菁悦活力镜片"
-      ],
-      country: [
-        "中国",
-        "德国",
-        "日本",
-        "美国",
-        "以色列",
-        "法国",
-        "韩国",
-        "英国"
-      ]
+      values: {
+        brand: {
+          ZEISS: "蔡司",
+          Essilor: "依视路",
+          HOYA: "豪雅",
+          Rodenstock: "罗敦司得",
+          Seiko: "精工",
+          Shamir: "沙米尔",
+          Chemilens: "凯米",
+          Younger: "雅歌",
+          Transitions: "全视线",
+          Kodak: "柯达",
+          Nikon: "尼康",
+          Asahi: "朝日",
+          TOKAI: "东海",
+          WX: "万新",
+          Conant: "康耐特",
+          Mingyue: "明月",
+          Norville: "诺威尔",
+          ITOH: "伊藤",
+          Nidek: "尼德克"
+        },
+        type: [
+          "单光镜片",
+          "渐进镜片",
+          "防蓝光镜片",
+          "太阳镜片",
+          "偏光镜片",
+          "运动镜片",
+          "变色镜片",
+          "染色镜片",
+          "定制镜片",
+          "成长乐镜片",
+          "驾驶型镜片",
+          "数码型镜片",
+          "菁悦活力镜片"
+        ],
+        country: [
+          "中国",
+          "德国",
+          "日本",
+          "美国",
+          "以色列",
+          "法国",
+          "韩国",
+          "英国"
+        ],
+        texture: ["树脂", "玻璃", "PC", "Trilogy"],
+        spherical: ["非球面", "球面"]
+      }
     };
   },
   methods: {
@@ -301,6 +278,17 @@ export default {
         skuId: this.product.sku[this.currentSku].id,
         amount: this.amount
       });
+    },
+    getproduct(productId = this.$route.params.productId) {
+      this.$http
+        .post(this.$api.getProduct, {
+          productId: productId
+        })
+        .then(res => {
+          console.log(res.product);
+          this.product = res.product;
+          console.log(res.product);
+        });
     }
   },
   computed: {
@@ -310,6 +298,10 @@ export default {
   },
   components: {
     rate: rate
+  },
+  beforeRouteUpdate(to, from, next) {
+    alert(to.params.productId);
+    this.getproduct(to.params.productId);
   }
 };
 </script>

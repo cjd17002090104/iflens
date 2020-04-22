@@ -1,6 +1,7 @@
 import axios from 'axios';
 import layer from 'layui-layer'
 import qs from 'qs'
+import store from '../store';
 
 import router from '../router';
 let localhosts = '/api';   //请求的后台域名
@@ -34,9 +35,9 @@ function successfun(res) {//处理后台返回的非200错误
 
     } else {
         if (res.message) {
-            layer.msg(res.message, { icon: 1 });
+            layer.msg(res.message, { icon: 3 });
         }
-        layer.msg(res.message, { icon: 3 });
+
         return res;
     }
 }
@@ -44,7 +45,11 @@ function successfun(res) {//处理后台返回的非200错误
 
 function errorfun(res) {
     if (res.status != 200) {
-        layer.msg(res.data.message, { icon: 3 });
+        layer.msg(res.data.message, { icon: 3 }, function () {
+            if (res.data.message == "Token has expired") {
+                store.commit("tokenExpried")
+            }
+        }, { shade: [0.8] });
         return res;
     }
 }

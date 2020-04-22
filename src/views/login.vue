@@ -26,8 +26,8 @@
             <div class="col-sm-6 col-sm-offset-3 form-box">
               <div class="form-top">
                 <div class="form-top-left">
-                  <h3>Login to our site</h3>
-                  <p>Enter your username and password to log on:</p>
+                  <h3>登陆我们的网站</h3>
+                  <p>输入您的邮箱和密码登录我们的网站</p>
                 </div>
                 <div class="form-top-right">
                   <button
@@ -114,7 +114,7 @@
                       v-model="userRegister.email"
                     />
                   </div>
-                  <div class="form-group input-group">
+                  <!-- <div class="form-group input-group">
                     <input
                       type="text"
                       name="form-username"
@@ -129,7 +129,7 @@
                         style="width:200px"
                       >Button</button>
                     </div>
-                  </div>
+                  </div>-->
                   <a class="btn" id="loginBtn" @click="register()">注 册</a>
                 </form>
               </div>
@@ -201,14 +201,25 @@ export default {
     //获取用户信息存入vuex
     getAuth() {
       //发送token
+      let that = this;
       this.$http.post(this.$api.getAuth).then(res => {
         if (res.status == 200) {
           //存入localstorage
           localStorage.user = JSON.stringify(res.user);
           //存入vuex
           this.$store.commit("setUser");
-
-          this.$router.push({ path: "/" });
+          if (res.user.is_activity) {
+            this.$router.push({ path: "/" });
+          } else {
+            layer.msg(
+              "邮箱未验证，请于" +
+                res.user.activity_expire +
+                "之前前往邮箱验证",
+              function() {
+                that.$router.push({ path: "/" });
+              }
+            );
+          }
         }
       });
     },

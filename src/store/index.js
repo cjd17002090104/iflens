@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import router from '../router'
 
 Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         user: "",
-        isLogin: 0,
+        isLogin: localStorage.user ? 1 : 0,
         products: null,
         //品牌筛选
         currentBrand: null,
@@ -37,6 +37,10 @@ export default new Vuex.Store({
         },
         setSearchProducts(state, products) {
             state.searchProducts = products;
+        },
+        tokenExpried() {
+            this.commit("logout")
+            router.push({ name: "login" });
         }
 
     },

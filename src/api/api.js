@@ -13,4 +13,7 @@ export default {
     getHotProducts: "getHotProducts",
     getSearchProducts: "getSearchProducts",
     upload: "upload",
+    emailValidation: "emailValidation",
+    deleteCartItems: "deleteCartItems",
+    changePassword: "changePassword",
 }

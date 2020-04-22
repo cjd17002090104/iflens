@@ -23,12 +23,17 @@
                 clip-rule="evenodd"
               />
             </svg>
-            <span style="letter-spacing:20px;">分类</span>
+            <span style="letter-spacing:20px;">导航</span>
           </div>
-          <div class="dropdown-menu" style="width:270px;">
-            <button class="dropdown-item" type="button">Action</button>
-            <button class="dropdown-item" type="button">Another action</button>
-            <button class="dropdown-item" type="button">Something else here</button>
+          <div class="dropdown-menu" style="width:270px;margin-top:-10px;">
+            <button
+              class="dropdown-item"
+              type="button"
+              style="text-align:center"
+              v-for="(page,index) of this.page"
+              :key="index"
+              @click="$router.push({name:page.value})"
+            >{{page.name}}</button>
           </div>
         </div>
       </div>
@@ -39,7 +44,9 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      page: [{ name: "商品列表", value: "shop" }]
+    };
   }
 };
 </script>

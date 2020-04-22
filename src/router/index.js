@@ -6,6 +6,7 @@ import shop from '@/views/shop'
 import productInfo from '@/views/shopInfo'
 import user from '@/views/user'
 import orderList from '@/views/orderList'
+import mail from '@/views/mail'
 
 Vue.use(Router)
 
@@ -51,6 +52,14 @@ export default new Router({
         login: true
       },
       component: user
+    },
+    {
+      path: '/mail/:activity_token',
+      name: 'mail',
+      meta: {
+        login: false
+      },
+      component: mail
     },
 
   ]
